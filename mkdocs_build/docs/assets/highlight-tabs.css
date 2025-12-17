@@ -1,0 +1,4 @@
+.md-tabs__link--active {
+  text-decoration: underline;
+  text-underline-offset: 8px;
+}

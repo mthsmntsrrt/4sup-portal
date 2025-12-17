@@ -1,0 +1,129 @@
+/* ==== fontes (Inter + JetBrains Mono) ==== */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  --md-text-font: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --md-code-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* ==== paleta custom (claro) ==== */
+  --brand-primary: #005ff9;
+  --brand-accent: #6a5af9;
+
+  --md-primary-fg-color: var(--brand-primary);
+  --md-accent-fg-color: var(--brand-accent);
+
+  --card-radii: 16px;
+  --elev: 0 8px 24px rgba(0,0,0,.08);
+  --elev-hover: 0 10px 30px rgba(0,0,0,.12);
+}
+
+[data-md-color-scheme="slate"] {
+  --brand-primary: #7fb4ff;
+  --brand-accent: #a69bff;
+
+  --md-primary-fg-color: var(--brand-primary);
+  --md-accent-fg-color: var(--brand-accent);
+}
+
+/* ==== títulos ==== */
+.md-typeset h1 {
+  letter-spacing: .2px;
+  font-weight: 700;
+}
+
+.md-typeset h2 {
+  letter-spacing: .1px;
+  font-weight: 700;
+}
+
+/* ==== HERO ==== */
+.hero {
+  margin: 1.2rem 0 2rem;
+  padding: 2.4rem;
+  border-radius: 20px;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(0,95,249,.12), transparent 60%),
+    linear-gradient(135deg, rgba(106,90,249,.10), rgba(0,0,0,.0));
+  border: 1px solid rgba(0,95,249,.15);
+  box-shadow: var(--elev);
+}
+
+.hero h1 {
+  margin: 0 0 .6rem;
+  font-size: 2.2rem;
+}
+
+.hero p {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  opacity: .9;
+}
+
+.hero .actions .md-button {
+  margin-right: .5rem;
+}
+
+/* ==== cards grid ==== */
+.grid.cards > ul {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (min-width: 1000px) {
+  .grid.cards > ul {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.grid.cards .card {
+  border-radius: var(--card-radii);
+  box-shadow: var(--elev);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.grid.cards .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elev-hover);
+}
+
+/* ==== tabelas e imagens ==== */
+.md-typeset table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.md-typeset img {
+  border-radius: 12px;
+}
+
+/* ==== code blocks ==== */
+.highlight,
+pre code,
+code {
+  border-radius: 10px;
+}
+
+/* ==== botões ==== */
+.md-button--primary {
+  background: var(--brand-primary);
+}
+
+.md-button--primary:hover {
+  filter: brightness(1.05);
+}
+
+/* ==== tabs topo destacadas ==== */
+.md-tabs__link {
+  font-weight: 600;
+}
+
+/* ==== badges ==== */
+.badge {
+  display:inline-block;
+  padding:.18rem .5rem;
+  border-radius:999px;
+  background: rgba(106,90,249,.12);
+  color: var(--brand-accent);
+  font-size:.8rem;
+  font-weight:6;
+}

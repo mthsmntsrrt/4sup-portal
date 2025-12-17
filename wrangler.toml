@@ -1,0 +1,12 @@
+name = "portal-4sup"
+main = "_worker.js"
+compatibility_date = "2024-01-01"
+
+# Diz ao Cloudflare Pages que estamos usando Pages Functions (advanced mode)
+pages_build_output_dir = "./"
+
+# Binding do D1 (vamos criar depois)
+[[d1_databases]]
+binding = "DB"
+database_name = "docs_portal"
+database_id = ""  # PREENCHER DEPOIS após criar o DB no painel
