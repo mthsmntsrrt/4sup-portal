@@ -7,5 +7,5 @@ pages_build_output_dir = "."
 # Binding do D1 (será preenchido depois)
 [[d1_databases]]
 binding = "DB"
-database_name = "docs_portal"
+database_name = "4sup-documentation"
 database_id = "" # preencher após criar o D1 no painel
