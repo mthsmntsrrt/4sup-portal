@@ -1,11 +1,9 @@
 name = "portal-4sup"
 compatibility_date = "2024-01-01"
 
-# Pages Functions (advanced mode)
 pages_build_output_dir = "."
 
-# Binding do D1 (será preenchido depois)
 [[d1_databases]]
 binding = "DB"
 database_name = "4sup-documentation"
-database_id = "" # preencher após criar o D1 no painel
+database_id = "db3199b2-b966-44e4-a2ec-e9b0653b89e3"
