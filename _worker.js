@@ -1,78 +1,82 @@
 export default {
   async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    const { pathname } = url;
+    try {
+      const url = new URL(request.url);
+      const { pathname } = url;
 
-    // Limpeza leve de sessões expiradas (1% das requisições)
-    if (Math.random() < 0.01) {
-      ctx.waitUntil(cleanExpiredSessions(env));
-    }
-
-    // --- API ---
-    if (pathname === "/api/login" && request.method === "POST") {
-      return handleLogin(request, env);
-    }
-
-    if (pathname === "/api/logout" && request.method === "POST") {
-      return handleLogout(request, env);
-    }
-
-    // --- Links virtuais (não expõe URL real no HTML) ---
-    // Ex.: /go/portal_web  -> redireciona para o link do cliente logado
-    if (pathname.startsWith("/go/") && request.method === "GET") {
-      const sess = await getSession(request, env);
-      if (!sess) {
-        const loginUrl = new URL("/", url.origin);
-        loginUrl.searchParams.set("redirectTo", pathname + url.search);
-        return Response.redirect(loginUrl.toString(), 302);
+      // Limpeza leve de sessões expiradas (1% das requisições)
+      if (env.DB && Math.random() < 0.01) {
+        ctx.waitUntil(cleanExpiredSessions(env));
       }
 
-      const key = pathname.slice("/go/".length).trim();
-      if (!key) return new Response("Link inválido", { status: 400 });
-
-      const row = await env.DB.prepare(
-        "SELECT url FROM links_empresa WHERE empresa = ? AND link_key = ?"
-      ).bind(sess.empresa, key).first();
-
-      if (!row?.url) return new Response("Link não configurado", { status: 404 });
-
-      // Allowlist para evitar open redirect malicioso
-      const target = new URL(row.url);
-      const allowedHosts = [
-        "gesoper.terceirizemais.com.br",
-        "app.powerbi.com",
-        // adicione aqui SOMENTE os hosts permitidos
-      ];
-
-      if (!allowedHosts.includes(target.hostname)) {
-        return new Response("Destino não permitido", { status: 403 });
+      // --- API ---
+      if (pathname === "/api/login" && request.method === "POST") {
+        return await handleLogin(request, env);
       }
 
-      return Response.redirect(target.toString(), 302);
-    }
-
-    // --- /docs protegido ---
-    if (pathname === "/docs" || pathname.startsWith("/docs/")) {
-      const sess = await getSession(request, env);
-      if (!sess) {
-        const loginUrl = new URL("/", url.origin);
-        loginUrl.searchParams.set("redirectTo", pathname + url.search);
-        return Response.redirect(loginUrl.toString(), 302);
+      if (pathname === "/api/logout" && request.method === "POST") {
+        return await handleLogout(request, env);
       }
 
-      const docsPath =
-        pathname === "/docs"
-          ? "/mkdocs_build/"
-          : "/mkdocs_build" + pathname.slice("/docs".length);
+      // --- Links virtuais ---
+      if (pathname.startsWith("/go/") && request.method === "GET") {
+        const sess = await getSession(request, env);
+        if (!sess) {
+          const loginUrl = new URL("/", url.origin);
+          loginUrl.searchParams.set("redirectTo", pathname + url.search);
+          return Response.redirect(loginUrl.toString(), 302);
+        }
 
-      const assetUrl = new URL(docsPath + url.search, url.origin);
-      return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
+        const key = pathname.slice("/go/".length).trim();
+        if (!key) return new Response("Link inválido", { status: 400 });
+
+        const row = await env.DB.prepare(
+          "SELECT url FROM links_empresa WHERE empresa = ? AND link_key = ?"
+        ).bind(sess.empresa, key).first();
+
+        if (!row?.url) return new Response("Link não configurado", { status: 404 });
+
+        const target = new URL(row.url);
+        const allowedHosts = ["gesoper.terceirizemais.com.br", "app.powerbi.com"];
+        if (!allowedHosts.includes(target.hostname)) {
+          return new Response("Destino não permitido", { status: 403 });
+        }
+
+        return Response.redirect(target.toString(), 302);
+      }
+
+      // --- /docs protegido ---
+      if (pathname === "/docs" || pathname.startsWith("/docs/")) {
+        const sess = await getSession(request, env);
+        if (!sess) {
+          const loginUrl = new URL("/", url.origin);
+          loginUrl.searchParams.set("redirectTo", pathname + url.search);
+          return Response.redirect(loginUrl.toString(), 302);
+        }
+
+        const docsPath =
+          pathname === "/docs"
+            ? "/mkdocs_build/"
+            : "/mkdocs_build" + pathname.slice("/docs".length);
+
+        const assetUrl = new URL(docsPath + url.search, url.origin);
+        return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
+      }
+
+      return env.ASSETS.fetch(request);
+    } catch (e) {
+      return json(
+        {
+          error: "Unhandled exception",
+          message: String(e?.message || e),
+          stack: e?.stack ? String(e.stack).split("\n").slice(0, 10) : null,
+        },
+        500
+      );
     }
-
-    // Demais rotas: estático normal (login page, assets, etc.)
-    return env.ASSETS.fetch(request);
   },
 };
+
 
 // -------------------- Cookies / sessão --------------------
 
