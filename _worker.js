@@ -1,11 +1,17 @@
 const crypto = globalThis.crypto;
 const atob = globalThis.atob;
 
+
 export default {
+
   async fetch(request, env, ctx) {
     try {
       const url = new URL(request.url);
       const { pathname } = url;
+
+      if (pathname === "/__worker_check") {
+        return new Response("WORKER_OK", { status: 200 });
+      }
 
       // DEBUG: endpoint para confirmar que o worker está rodando
       if (pathname === "/api/_debug") {
@@ -20,6 +26,9 @@ export default {
           { headers: { "Content-Type": "application/json" } }
         );
       }
+      
+      
+
 
       // sua lógica original daqui pra baixo (igual estava)
       // ...
