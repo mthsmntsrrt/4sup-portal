@@ -1,3 +1,7 @@
+const crypto = globalThis.crypto;
+const atob = globalThis.atob;
+
+
 export default {
   async fetch(request, env, ctx) {
     try {
